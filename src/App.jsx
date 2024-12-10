@@ -14,6 +14,7 @@ const App = () => {
     const fetchPets = async () => {
       try {
         const pets = await petService.index();
+        console.log("Pets:", pets)
         // Don't forget the pass the error object to the new Error
         if (pets.error) {
           throw new Error(pets.error);
@@ -31,8 +32,24 @@ const App = () => {
     setSelected(pet)
   };
 
-  const handleFormView = () => {
+  const handleFormView = (pet) => {
+    if (!pet.name) setSelected(null);
     setIsFormOpen(!isFormOpen);
+  };
+
+  const handleAddPet = async (formData) => {
+    try {
+      const newPet = await petService.create(formData);
+
+      if (newPet.error) {
+        throw new Error(newPet.error);
+      }
+      setPetList([newPet, ...petList]);
+      setIsFormOpen(false);
+    } catch (error) {
+      // Log the error to the console
+      console.log(error);
+    }
   };
 
   return (
@@ -44,13 +61,12 @@ const App = () => {
         isFormOpen={isFormOpen}
       />
       {isFormOpen ? (
-        <PetForm />
+        <PetForm handleAddPet={handleAddPet} selected={selected} />
       ) : (
-        <PetDetail selected={selected} />
+        <PetDetail selected={selected} handleFormView={handleFormView} />
       )}
     </>
   );
 };
 
-export default App
-
+export default App;
