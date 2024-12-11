@@ -10,7 +10,7 @@ const index = async () => {
     return res.json();
     
     } catch (error) {
-        console.log(error);
+        console.log("index error:", error);
     }
 };
 
@@ -30,8 +30,34 @@ const create = async (formData) => {
       });
       return res.json();
     } catch (err) {
-      console.log(err);
+      console.log("createPet error:", err);
     }
   };
 
-export { index, create };
+const updatePet = async (formData, petId) => {
+  try {
+    const res = await fetch(`${BASE_URL}/${petId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
+    });
+    return res.json();
+  } catch (err) {
+    console.log("updatePet error:", err)
+  }
+};
+
+const deletePet = async (petId) => {
+  try {
+    const deletedPet = await fetch(`${BASE_URL}/${petId}`, {
+      method: 'DELETE', 
+    });
+    return deletedPet.json();
+  } catch (err) {
+    console.log("deletePet error:", err)
+  }
+};
+
+export { index, create, updatePet, deletePet };

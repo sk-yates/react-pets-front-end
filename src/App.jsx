@@ -22,7 +22,7 @@ const App = () => {
         setPetList(pets);
       } catch (error) {
         // Log the error object
-        console.log(error);
+        console.log("Pet list error:", error);
       }
     };
     fetchPets();
@@ -48,7 +48,44 @@ const App = () => {
       setIsFormOpen(false);
     } catch (error) {
       // Log the error to the console
-      console.log(error);
+      console.log("handleAddPet error:", error);
+    }
+  };
+
+  const handleUpdatePet = async (formData, petId) => {
+    try {
+      const updatedPet = await petService.updatePet(formData, petId);
+
+      if (updatedPet.error) {
+        throw new Error(updatedPet.error);
+      }
+
+      const updatedPetList = petList.map((pet) =>
+        pet._id !== updatedPet._id ? pet : updatedPet
+      );
+
+      setPetList(updatedPetList)
+      setSelected(updatedPet)
+      setIsFormOpen(false)
+    } catch (error) {
+      console.log("handleUpdatePet error:", error)
+
+    }
+  };
+
+  const handleRemovePet = async (petId) => {
+    try {
+      const deletedPet = await petService.deletePet(petId);
+
+      if (deletedPet.error) {
+        throw new Error(deletedPet.error);
+      }
+
+      setPetList(petList.filter((pet) => pet._id !== deletedPet._id));
+      setSelected(null);
+      setIsFormOpen(false);
+    } catch (error) {
+      console.log("handRemovePet error:", error)
     }
   };
 
@@ -61,9 +98,15 @@ const App = () => {
         isFormOpen={isFormOpen}
       />
       {isFormOpen ? (
-        <PetForm handleAddPet={handleAddPet} selected={selected} />
+        <PetForm selected={selected}
+          handleAddPet={handleAddPet}
+          handleUpdatePet={handleUpdatePet}
+        />
       ) : (
-        <PetDetail selected={selected} handleFormView={handleFormView} />
+        <PetDetail selected={selected}
+          handleFormView={handleFormView}
+          handleRemovePet={handleRemovePet}
+        />
       )}
     </>
   );
